@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  
+.form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-row-gap: 10px;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.form label {
+    margin-bottom: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form input[type="text"],
+.form input[type="date"] {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 10px;
+}
+
+.form button[type="submit"] {
+    padding: 10px 20px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table th, table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+}
+
+table th {
+    background-color: blue;
+    color: #fff;
+    font-weight: bold;
+}
+
+table td {
+    text-align: center;
+}
+
+
+table td button {
+    padding: 5px 10px;
+    margin-right: 5px;
+    background-color: blue;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+table td button:last-child {
+    margin-right: 0;
+}
+
+
+body {
+    background-color: #fff;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+h1 {
+    color: blue;
+    margin-bottom: 20px;
+}
+</style>
+</head>
+<body>
+
+<h1>Calendario de Aniversário</h1>
+
+<form class="form" id="person-form">
+    <label for="name">Nome</label>
+    <input type="text" id="name" required>
+
+    <label for="birthdate">Data de Nascimento</label>
+    <input type="date" id="birthdate" required>
+
+    <button type="submit">Salvar</button>
+</form>
+
+<table>
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Data de Nascimento</th>
+            <th>Ação</th>
+        </tr>
+    </thead>
+    <tbody id="table-body">
+    </tbody>
+</table>
+
+<script>
+    
+    const form = document.getElementById('person-form');
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        
+        const nameInput = document.querySelector('#name');
+        const birthdateInput = document.querySelector('#birthdate');
+
+        const name = nameInput.value;
+        const birthdate = birthdateInput.value;
+
+       
+        const person = {
+            name: name,
+            birthdate: birthdate,
+        };
+
+       
+        localStorage.setItem('person', JSON.stringify(person));
+
+        updateTable();
+
+        
+        nameInput.value = '';
+        birthdateInput.value = '';
+    });
+
+    function updateTable() {
+        const tableBody = document.querySelector('#table-body');
+
+        tableBody.innerHTML = '';
+
+        const savedPerson = JSON.parse(localStorage.getItem('person'));
+
+        if (savedPerson) {
+            const row = document.createElement('tr');
+            const nameCell = document.createElement('td');
+            const birthdateCell = document.createElement('td');
+            const actionCell = document.createElement('td'); 
+
+            nameCell.textContent = savedPerson.name;
+            birthdateCell.textContent = savedPerson.birthdate;
+
+            row.appendChild(nameCell);
+            row.appendChild(birthdateCell);
+            row.appendChild(actionCell); 
+
+            tableBody.appendChild(row);
+
+            const editButton = document.createElement('button');
+            editButton.textContent = 'Editar';
+
+            actionCell.appendChild(editButton);
+
+            editButton.addEventListener('click', function() {
+
+                const nameInput = document.querySelector('#name');
+                const birthdateInput = document.querySelector('#birthdate');
+
+                nameInput.value = savedPerson.name;
+                birthdateInput.value = savedPerson.birthdate;
+            });
+
+            const removeButton = document.createElement('button');
+            removeButton.textContent = 'Remover';
+
+            actionCell.appendChild(removeButton);
+
+            removeButton.addEventListener('click', function() {
+                row.remove();
+
+                localStorage.removeItem('person');
+
+                updateTable();
+            });
+        }
+    }
+
+    updateTable();
+</script>
+
+</body>
+</html>
